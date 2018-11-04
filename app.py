@@ -124,56 +124,6 @@ def tobs():
     return jsonify(query_temp_df.to_dict())
 
 
-####################################################
-#/api/v1.0/<start> and /api/v1.0/<start>/<end>
-#Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
-
-#When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date.
-####################################################
-@app.route("/api/v1.0/<start>")
-def tempstart(start):
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
-
-    try:
-        start_date= dt.datetime.strptime(start, '%Y-%m-%d')
-        query_normals = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-                                filter(Measurement.date >= start_date)
-        normals={}
-        normals['date start'] = start_date
-        normals['temp min'] = list(query_normals)[0][0]
-        normals['temp avg'] = list(query_normals)[0][1]
-        normals['temp max'] = list(query_normals)[0][2]
-        return jsonify( normals )
-    except:
-        return f"please enter the date in the form Y-m-d, example (2017-01-01)"
-
-####################################################
-#When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
-####################################################
-@app.route("/api/v1.0/<start>/<end>")
-def tempstartend(start,end):
-
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
-
-    try:
-        start_date= dt.datetime.strptime(start, '%Y-%m-%d')
-        end_date= dt.datetime.strptime(end, '%Y-%m-%d')
-
-        query_normals = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-                                filter(Measurement.date >= start_date).filter(Measurement.date <= end_date)
-        normals={}
-        normals['date start'] = start_date
-        normals['date end'] = end_date
-        normals['temp min'] = list(query_normals)[0][0]
-        normals['temp avg'] = list(query_normals)[0][1]
-        normals['temp max'] = list(query_normals)[0][2]
-        return jsonify( normals )
-    except:
-        return f"please enter the date in yyy-mm-dd)"
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
