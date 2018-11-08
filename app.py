@@ -70,22 +70,20 @@ def precipitation():
 
 # Query for the dates and precipitation observations from the last year.
     Max_date = session.query(func.max(Measurement.date)).first()
-    Max_date
+    
+    # Get the first element of the tuple
+    max_date = max_date[0]
+    
     one_year_ago = dt.date(2017, 8, 23) - dt.timedelta(365)
     one_year_ago
 
-    query_temp = session.query(Measurement.tobs,Measurement.date).filter(Measurement.station==most_active_station_id).\
-                filter(Measurement.date>one_year_ago).all()
+    results = session.query(Measurement.prcp, Measurement.date).filter(Measurement.date > '2016-08-23').all()
                                                                     
+    # Convert list of tuples into normal list
+    precipitation_dict = dict(results)
 
-# convert query result to a dictionary with `date` and `prcp` as the keys and values
-    date_prcp = []
-    for query_result in query_date_prcp:
-        prcp_row = {}
-        prcp_row["date"] = query_result[0]
-        prcp_row["prcp"] = query_result[1]
-        date_prcp.append(prcp_row)
-    return jsonify(date_prcp)
+    return jsonify(precipitation_dict)
+
 
 #/api/v1.0/stations
 #Return a JSON list of stations from the dataset.
