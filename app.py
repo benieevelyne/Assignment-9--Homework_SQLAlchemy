@@ -89,14 +89,13 @@ def precipitation():
 #Return a JSON list of stations from the dataset.
 @app.route("/api/v1.0/stations")
 def stations():
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
+    # Query stations
+    results_stations =  session.query(Measurement.station).group_by(Measurement.station).all()
 
-    query_station_results = session.query(Station.station,Station.name).\
-                        group_by(Station.name).all()
-    
-    #directly covert query result to dictionary and jsonify to return
-    return  jsonify( dict(query_station_name) )
+    # Convert list of tuples into normal list
+    stations_list = list(np.ravel(results_stations))
+
+    return jsonify(stations_list)
 
 
 #/api/v1.0/tobs
